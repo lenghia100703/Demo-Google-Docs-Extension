@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "Google Docs Extension",
+    "version": "1.0",
+    "permissions": [
+        "storage",
+        "identity"
+    ],
+    "host_permissions": [
+        "https://www.googleapis.com/"
+    ],
+    "oauth2": {
+        "client_id": "969387053810-lvfgk4oibn7k2pmomdnc6ulhfals7525.apps.googleusercontent.com",
+        "scopes": ["https://www.googleapis.com/auth/documents"],
+        "userinfo_endpoint": "https://www.googleapis.com/oauth2/v3/userinfo"
+    },
+    "action": {
+        "default_title": "Google Docs Extension",
+        "default_popup": "popup.html"
+    }
+}
+
