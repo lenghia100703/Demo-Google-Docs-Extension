@@ -8,8 +8,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const insertButton = document.getElementById('insert_button')
     const textInput = document.getElementById('textInput')
     const replaceButton = document.getElementById('replace_button')
+    const accountInfo = document.getElementById('account')
 
-    let startIndex, endIndex
+    let startIndex, endIndex, url
 
     startIndexEl.onchange = function () {
         startIndex = startIndexEl.value
@@ -19,11 +20,26 @@ document.addEventListener('DOMContentLoaded', function () {
         endIndex = endIndexEl.value
     }
 
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        url = tabs[0].url;
+        console.log(url)
+    });
+
     authorizeButton.onclick = function () {
         chrome.identity.getAuthToken({interactive: true}, function (token) {
             console.log('Login successful')
+            chrome.identity.getProfileUserInfo((profile) => {
+                accountInfo.innerText = profile.email
+                chrome.storage.local.set({ 'userEmail': profile.email });
+            });
         });
     }
+
+    chrome.storage.local.get(['userEmail'], function (result) {
+        if (result.userEmail) {
+            accountInfo.innerText = result.userEmail;
+        }
+    });
 
     getTextButton.onclick = function () {
         chrome.identity.getAuthToken({interactive: true}, function (token) {
@@ -56,6 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
             revokeToken(token, function () {
                 removeAllTokens();
                 console.log('Sign Out successful');
+                accountInfo.innerText = '';
+                chrome.storage.local.remove(['userEmail']);
             })
         });
     }
@@ -69,16 +87,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function removeAllTokens() {
         chrome.identity.getAuthToken({interactive: false}, function (token) {
-            if (!chrome.runtime.lastError) {
-                chrome.identity.removeCachedAuthToken({token: token}, function () {
-                    console.log('Token removed');
-                });
-            }
+            chrome.identity.removeCachedAuthToken({token: token}, function () {
+                console.log('Token removed');
+            });
+
         });
     }
 
     function makeApiCall(token) {
-        fetch('https://docs.googleapis.com/v1/documents/170MKshWqHCJYz4WMEC6Lpjwe10m5Q6KzKMwA9h6AJF8', {
+        const documentId = url.split("/")[5]
+        fetch(`https://docs.googleapis.com/v1/documents/${documentId}`, {
             headers: {
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json',
@@ -92,7 +110,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function deleteText(token, startIndex, endIndex) {
-        const apiUrl = `https://docs.googleapis.com/v1/documents/170MKshWqHCJYz4WMEC6Lpjwe10m5Q6KzKMwA9h6AJF8:batchUpdate`;
+        const documentId = url.split("/")[5]
+        const apiUrl = `https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate`;
         const headers = {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -126,7 +145,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function insertText(token, startIndex, text) {
-        const apiUrl = 'https://docs.googleapis.com/v1/documents/170MKshWqHCJYz4WMEC6Lpjwe10m5Q6KzKMwA9h6AJF8:batchUpdate'
+        const documentId = url.split("/")[5]
+        const apiUrl = `https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate`
         const headers = {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

@@ -5,14 +5,17 @@
     <script src="popup.js"></script>
 </head>
 <body>
-    <div style="width: 300px">
+    <div style="width: 300px; display: block">
         <h1>Google Docs Extension</h1>
+        <h3 id="account"></h3>
         <button id="authorize_button" style="display: block;">Authorize</button>
         <button id="signout_button" style="display: block;">Sign Out</button>
         <button id="get_text_button" style="display: block;">Get Text</button>
-        <input id="startIndex" value="">
-        <input id="endIndex" value="">
-        <input id="textInput" value="" placeholder="input text to insert">
+        <input id="startIndex" value="" placeholder="start index of word">
+        <input id="endIndex" value="" placeholder="end index of word">
+        <div>
+            <input id="textInput" value="" placeholder="input text to insert">
+        </div>
         <button id="delete_button">Delete</button>
         <button id="insert_button">Insert</button>
         <button id="replace_button">Replace</button>

@@ -4,7 +4,9 @@
     "version": "1.0",
     "permissions": [
         "storage",
-        "identity"
+        "identity",
+        "identity.email",
+        "tabs"
     ],
     "host_permissions": [
         "https://www.googleapis.com/"
@@ -17,6 +19,15 @@
     "action": {
         "default_title": "Google Docs Extension",
         "default_popup": "popup.html"
-    }
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "content-script.js"
+            ],
+            "matches": ["https://docs.google.com/document/*"],
+            "run_at": "document_start"
+        }
+    ]
 }
 
